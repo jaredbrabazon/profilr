@@ -1,0 +1,21 @@
+Package: profilr
+Title: Identifies significant changes in a changing data set with time  
+Version: 0.1
+Authors@R: person("Jared", "Brabazon", email = "jbrabazon13@gmail.com", role = c("aut", "cre"))
+Description: This package contains two functions that allow for delineating significant
+  changes in stacks of data. This was originally made to detect significant changes in
+  pixel values of a stack of changing images.
+Depends: R (>= 3.3.0), 
+  tidyverse,
+  changepoint
+Imports: tidyverse,
+  changepoint
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Suggests: knitr,
+    rmarkdown,
+    changepoint,
+    testthat
+RoxygenNote: 6.0.1
+VignetteBuilder: knitr
