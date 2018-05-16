@@ -4,26 +4,38 @@
 \alias{imageprof}
 \title{Identifies significant changes for each column of a matrix image over time}
 \usage{
-imageprof(basepath = NULL, savepath = NULL, filename, L_per_pix = 1,
-  stats = FALSE, type = "meanvar", filetail = NULL)
+imageprof(basepath = NULL, savepath = NULL, samplename = NULL,
+  L_per_pix = 1, stats = FALSE, type = "meanvar", filetail = NULL)
 }
 \arguments{
+\item{basepath}{a file directory to a folder containing matrix images (e.g. TIFF or text images)}
+
+\item{savepath}{a file directory to a desired save folder}
+
+\item{samplename}{desired name of the sample, enter in quotes (e.g. "sample-x"), if left as NULL then the folder name will be used}
+
 \item{L_per_pix}{a unit conversion of length per pixel, or desired unit per data unit; default = 1 which implies no conversion}
 
-\item{type}{type of changepoint desired. Choose between "meanvar" (mean and variance), "mean", "variance", and "all" (changepoints for meanvar, mean, and variance); note the default is "meanvar" see Killick et al., 2013 for more details}
+\item{stats}{indicates if a dataframe of statistics should be saved in place of changepoint dataframe. This stats dataframe includes the mean, median, variance, and sdev of all the changepoints taken within each column in the matrix, default =FALSE}
 
-\item{data}{a matrix of data, typically from a tiff or other matrix type image}
+\item{type}{type of changepoint desired. Choose between "meanvar" (mean and variance), "mean", and "variance"(changepoints for meanvar, mean, and variance); note the default is "meanvar" see Killick et al., 2013 for more details}
+
+\item{filetail}{to add a desired save file tail after the samplename, default includes "samplename"_"meanvar(or other type)".csv for stats = FALSE and "samplename"_"meanvar(or other type)"_"stats".csv; change filetail by inputing a character string = "yourfiletail"}
 }
 \value{
-two possible return options. 1)results in a dataframe of changepoints along every x value of the matrix image with columns being the image title, where changepoints are potentially converted to unit of choice as indicated by user. 2) stats of each image in stack (e.g. mean, median, variance, stdev, of all changepoints in each image)
+two possible return options. 1)results in a dataframe where changepoints are the rows and the columns are the matrix image filename; changepoints are potentially converted to unit of choice as indicated by user. 2) stats of each image in stack (e.g. mean, median, variance, stdev, of all changepoints in each image)
 }
 \description{
 \code{imageprof} identifies the most significant statistical change in mean, variance, or both mean and variance in the data (often pixel data) as specified by user on changing datasets
 }
 \examples{
-changepoint_df <- imageprof(basepath = "./../file/directory/foldercontainingmatriximage/", savepath = "./../file/directory/desiredsavefolder/", filename = "filenameofmatriximageinbasepathfolder", L_per_pix = 1, stats = FALSE, type = "meanvar", filetail = NULL)
-stats_df <- imageprof(basepath = "./../file/directory/foldercontainingmatriximage/", savepath = "./../file/directory/desiredsavefolder/", filename = "filenameofmatriximageinbasepathfolder", L_per_pix = 1, stats = TRUE, type = "meanvar", filetail = NULL)
-variation_change_df <- imageprof(basepath = "./../../University/Research/rockimages/", savepath = "./../../University/Research/save/", filename = "rock-CO-1", L_per_pix = 0.123, stats = FALSE, type = "variance", filetail = "whateverfileendingiwant")
-change_mean_df <- imageprof(basepath = "./../../University/Research/rockimages/", savepath = "./../../University/Research/save/", filename = "rock-CO-1", L_per_pix = 0.5, stats = FALSE, type = "mean", filetail = "2018-5-14-changepoints")
-stats_df <- imageprof(basepath = "./../../University/Research/rockimages/", savepath = "./../../University/Research/save/", filename = "rock-CO-1", L_per_pix = 0.5, stats = TRUE, type = "meanvar", filetail = "2018-5-14-stats")
+changepoint_df <- imageprof(basepath = "./../file/directory/foldercontainingmatriximages/", savepath = "./../file/directory/desiredsavefolder/", samplename = NULL, L_per_pix = 1, stats = FALSE, type = "meanvar", filetail = NULL)
+
+stats_df <- imageprof(basepath = "./../file/directory/foldercontainingmatriximages/", savepath = "./../file/directory/desiredsavefolder/", samplename = "samplenumber123", L_per_pix = 1, stats = TRUE, type = "meanvar", filetail = NULL)
+
+variation_change_df <- imageprof(basepath = "./../../University/Research/rockimages/", savepath = "./../../University/Research/save/", samplename = "samplenumber", L_per_pix = 0.123, stats = FALSE, type = "variance", filetail = "conversion0.123")
+
+change_mean_df <- imageprof(basepath = "./../../University/Research/rockimages/", savepath = "./../../University/Research/save/", samplename = "rock-CO-1", L_per_pix = 0.5, stats = FALSE, type = "mean", filetail = "2018-5-14-changepoints")
+
+stats_df <- imageprof(basepath = "./../../University/Research/rockimages/", savepath = "./../../University/Research/save/", samplename = "rock-CO-1", L_per_pix = 0.5, stats = TRUE, type = "meanvar", filetail = "2018-5-14-stats")
 }

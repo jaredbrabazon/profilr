@@ -2,21 +2,29 @@
 #' 
 #' \code{imageprof} identifies the most significant statistical change in mean, variance, or both mean and variance in the data (often pixel data) as specified by user on changing datasets
 #' 
-#' @param data a matrix of data, typically from a tiff or other matrix type image
+#' @param basepath a file directory to a folder containing matrix images (e.g. TIFF or text images) 
+#' @param savepath a file directory to a desired save folder
+#' @param samplename desired name of the sample, enter in quotes (e.g. "sample-x"), if left as NULL then the folder name will be used
 #' @param L_per_pix a unit conversion of length per pixel, or desired unit per data unit; default = 1 which implies no conversion
-#' @param type type of changepoint desired. Choose between "meanvar" (mean and variance), "mean", "variance", and "all" (changepoints for meanvar, mean, and variance); note the default is "meanvar" see Killick et al., 2013 for more details
-#' @return two possible return options. 1)results in a dataframe of changepoints along every x value of the matrix image with columns being the image title, where changepoints are potentially converted to unit of choice as indicated by user. 2) stats of each image in stack (e.g. mean, median, variance, stdev, of all changepoints in each image)
+#' @param stats indicates if a dataframe of statistics should be saved in place of changepoint dataframe. This stats dataframe includes the mean, median, variance, and sdev of all the changepoints taken within each column in the matrix, default =FALSE
+#' @param type type of changepoint desired. Choose between "meanvar" (mean and variance), "mean", and "variance"(changepoints for meanvar, mean, and variance); note the default is "meanvar" see Killick et al., 2013 for more details
+#' @param filetail to add a desired save file tail after the samplename, default includes "samplename"_"meanvar(or other type)".csv for stats = FALSE and "samplename"_"meanvar(or other type)"_"stats".csv; change filetail by inputing a character string = "yourfiletail"
+#' @return two possible return options. 1)results in a dataframe where changepoints are the rows and the columns are the matrix image filename; changepoints are potentially converted to unit of choice as indicated by user. 2) stats of each image in stack (e.g. mean, median, variance, stdev, of all changepoints in each image)
 #' @examples 
-#' changepoint_df <- imageprof(basepath = "./../file/directory/foldercontainingmatriximage/", savepath = "./../file/directory/desiredsavefolder/", filename = "filenameofmatriximageinbasepathfolder", L_per_pix = 1, stats = FALSE, type = "meanvar", filetail = NULL)
-#' stats_df <- imageprof(basepath = "./../file/directory/foldercontainingmatriximage/", savepath = "./../file/directory/desiredsavefolder/", filename = "filenameofmatriximageinbasepathfolder", L_per_pix = 1, stats = TRUE, type = "meanvar", filetail = NULL)
-#' variation_change_df <- imageprof(basepath = "./../../University/Research/rockimages/", savepath = "./../../University/Research/save/", filename = "rock-CO-1", L_per_pix = 0.123, stats = FALSE, type = "variance", filetail = "whateverfileendingiwant")
-#' change_mean_df <- imageprof(basepath = "./../../University/Research/rockimages/", savepath = "./../../University/Research/save/", filename = "rock-CO-1", L_per_pix = 0.5, stats = FALSE, type = "mean", filetail = "2018-5-14-changepoints")
-#' stats_df <- imageprof(basepath = "./../../University/Research/rockimages/", savepath = "./../../University/Research/save/", filename = "rock-CO-1", L_per_pix = 0.5, stats = TRUE, type = "meanvar", filetail = "2018-5-14-stats")
+#' changepoint_df <- imageprof(basepath = "./../file/directory/foldercontainingmatriximages/", savepath = "./../file/directory/desiredsavefolder/", samplename = NULL, L_per_pix = 1, stats = FALSE, type = "meanvar", filetail = NULL)
+#' 
+#' stats_df <- imageprof(basepath = "./../file/directory/foldercontainingmatriximages/", savepath = "./../file/directory/desiredsavefolder/", samplename = "samplenumber123", L_per_pix = 1, stats = TRUE, type = "meanvar", filetail = NULL)
+#' 
+#' variation_change_df <- imageprof(basepath = "./../../University/Research/rockimages/", savepath = "./../../University/Research/save/", samplename = "samplenumber", L_per_pix = 0.123, stats = FALSE, type = "variance", filetail = "conversion0.123")
+#' 
+#' change_mean_df <- imageprof(basepath = "./../../University/Research/rockimages/", savepath = "./../../University/Research/save/", samplename = "rock-CO-1", L_per_pix = 0.5, stats = FALSE, type = "mean", filetail = "2018-5-14-changepoints")
+#' 
+#' stats_df <- imageprof(basepath = "./../../University/Research/rockimages/", savepath = "./../../University/Research/save/", samplename = "rock-CO-1", L_per_pix = 0.5, stats = TRUE, type = "meanvar", filetail = "2018-5-14-stats")
 #' @export
 
 
 
-imageprof <- function(basepath = NULL, savepath = NULL, filename, L_per_pix = 1, stats = FALSE, type = "meanvar", filetail = NULL){
+imageprof <- function(basepath = NULL, savepath = NULL, samplename = NULL, L_per_pix = 1, stats = FALSE, type = "meanvar", filetail = NULL){
  
   change_meanvar <- function(data){
     
@@ -42,11 +50,9 @@ imageprof <- function(basepath = NULL, savepath = NULL, filename, L_per_pix = 1,
   if((is.null(basepath) == FALSE) && (is.null(savepath) == FALSE)){
     base.path <- basepath
     
-    #connect a base path to the filename folder
-    path <- file.path(base.path, filename)
     
     #get character strings for each csv within the directory
-    path.delim <- dir(path, full.names = TRUE)
+    path.delim <- dir(base.path, full.names = TRUE)
     get_dimens <- read.delim(path.delim[1])
     px_width = ncol(get_dimens)
     px_height = nrow(get_dimens)
@@ -62,20 +68,20 @@ imageprof <- function(basepath = NULL, savepath = NULL, filename, L_per_pix = 1,
         }
         all_data <- data.frame(df)
         
-        column_names <- dir(path, full.names = FALSE)
+        column_names <- dir(base.path, full.names = FALSE)
         
         final <- all_data %>%
           select_(~contains("cpt")) %>%
           mutate_all(funs(px_height - .)) %>%
           mutate_all(funs(.*L_per_pix)) %>%
           `colnames<-`(c(column_names)) %>%
-          rownames_to_column(var = "x")
+          rownames_to_column(var = "matrix.column.number")
         
         save.path <- savepath
         
         if(stats == FALSE){
-          ##connect save path to the filename folder
-          save <- file.path(save.path, filename)
+          ##connect save path with samplename
+          save <- file.path(save.path, if(is.null(samplename) == TRUE){paste(basename(basepath))}else{paste(samplename)})
           filename.path <- file.path(save, if(is.null(filetail) == TRUE){paste(type)}else{paste(filetail)}, fsep = "_")
           csv.ending <- file.path(filename.path, "csv", fsep = ".")
           
@@ -84,39 +90,39 @@ imageprof <- function(basepath = NULL, savepath = NULL, filename, L_per_pix = 1,
           final
         } else if(stats == TRUE){
           mean_df <- final %>%
-            select(-x) %>%
+            select(-matrix.column.number) %>%
             summarise_all(funs(mean)) %>%
             t()%>%
             data.frame()
           colnames(mean_df)[colnames(mean_df) == "."] <- "mean"
           
           median_df <- final %>%
-            select(-x) %>%
+            select(-matrix.column.number) %>%
             summarise_all(funs(median)) %>%
             t()%>%
             data.frame()
           colnames(median_df)[colnames(median_df) == "."] <- "median"
           
           var_df <- final %>%
-            select(-x) %>%
+            select(-matrix.column.number) %>%
             summarise_all(funs(var)) %>%
             t()%>%
             data.frame()
           colnames(var_df)[colnames(var_df) == "."] <- "variance"
           
           sd_df <- final %>%
-            select(-x) %>%
+            select(-matrix.column.number) %>%
             summarise_all(funs(sd)) %>%
             t()%>%
             data.frame()
           colnames(sd_df)[colnames(sd_df) == "."] <- "standard.deviation"
           
           z <- nrow(mean_df)
-          x <- seq(1:z)
-          stats <- cbind(x, mean_df, median_df, var_df, sd_df)
+          image.order <- seq(1:z)
+          stats <- cbind(image.order, mean_df, median_df, var_df, sd_df)
           
           ##connect save path to the filename folder
-          save <- file.path(save.path, filename)
+          save <- file.path(save.path, if(is.null(samplename) == TRUE){paste(basename(basepath))}else{paste(samplename)})
           filename.path <- file.path(save, if(is.null(filetail) == TRUE){paste(type, "stats", sep = "_")}else{paste(filetail)}, fsep = "_")
           csv.ending <- file.path(filename.path, "csv", fsep = ".")
           
@@ -134,20 +140,20 @@ imageprof <- function(basepath = NULL, savepath = NULL, filename, L_per_pix = 1,
         }
         all_data <- data.frame(df)
         
-        column_names <- dir(path, full.names = FALSE)
+        column_names <- dir(base.path, full.names = FALSE)
         
         final <- all_data %>%
           select_(~contains("cpt")) %>%
           mutate_all(funs(px_height - .)) %>%
           mutate_all(funs(.*L_per_pix)) %>%
           `colnames<-`(c(column_names)) %>%
-          rownames_to_column(var = "x")
+          rownames_to_column(var = "matrix.column.number")
         
         save.path <- savepath
         
         if(stats == FALSE){
-          ##connect save path to the filename folder
-          save <- file.path(save.path, filename)
+          ##connect save path with samplename
+          save <- file.path(save.path, if(is.null(samplename) == TRUE){paste(basename(basepath))}else{paste(samplename)})
           filename.path <- file.path(save, if(is.null(filetail) == TRUE){paste(type)}else{paste(filetail)}, fsep = "_")
           csv.ending <- file.path(filename.path, "csv", fsep = ".")
           
@@ -156,39 +162,39 @@ imageprof <- function(basepath = NULL, savepath = NULL, filename, L_per_pix = 1,
           final
         } else if(stats == TRUE){
           mean_df <- final %>%
-            select(-x) %>%
+            select(-matrix.column.number) %>%
             summarise_all(funs(mean)) %>%
             t()%>%
             data.frame()
           colnames(mean_df)[colnames(mean_df) == "."] <- "mean"
           
           median_df <- final %>%
-            select(-x) %>%
+            select(-matrix.column.number) %>%
             summarise_all(funs(median)) %>%
             t()%>%
             data.frame()
           colnames(median_df)[colnames(median_df) == "."] <- "median"
           
           var_df <- final %>%
-            select(-x) %>%
+            select(-matrix.column.number) %>%
             summarise_all(funs(var)) %>%
             t()%>%
             data.frame()
           colnames(var_df)[colnames(var_df) == "."] <- "variance"
           
           sd_df <- final %>%
-            select(-x) %>%
+            select(-matrix.column.number) %>%
             summarise_all(funs(sd)) %>%
             t()%>%
             data.frame()
           colnames(sd_df)[colnames(sd_df) == "."] <- "standard.deviation"
           
           z <- nrow(mean_df)
-          x <- seq(1:z)
-          stats <- cbind(x, mean_df, median_df, var_df, sd_df)
+          image.order <- seq(1:z)
+          stats <- cbind(image.order, mean_df, median_df, var_df, sd_df)
           
           ##connect save path to the filename folder
-          save <- file.path(save.path, filename)
+          save <- file.path(save.path, if(is.null(samplename) == TRUE){paste(basename(basepath))}else{paste(samplename)})
           filename.path <- file.path(save, if(is.null(filetail) == TRUE){paste(type, "stats", sep = "_")}else{paste(filetail)}, fsep = "_")
           csv.ending <- file.path(filename.path, "csv", fsep = ".")
           
@@ -205,20 +211,20 @@ imageprof <- function(basepath = NULL, savepath = NULL, filename, L_per_pix = 1,
         }
         all_data <- data.frame(df)
         
-        column_names <- dir(path, full.names = FALSE)
+        column_names <- dir(base.path, full.names = FALSE)
         
         final <- all_data %>%
           select_(~contains("cpt")) %>%
           mutate_all(funs(px_height - .)) %>%
           mutate_all(funs(.*L_per_pix)) %>%
           `colnames<-`(c(column_names)) %>%
-          rownames_to_column(var = "x")
+          rownames_to_column(var = "matrix.column.number")
         
         save.path <- savepath
       
         if(stats == FALSE){
-          ##connect save path to the filename folder
-          save <- file.path(save.path, filename)
+          ##connect save path with samplename
+          save <- file.path(save.path, if(is.null(samplename) == TRUE){paste(basename(basepath))}else{paste(samplename)})
           filename.path <- file.path(save, if(is.null(filetail) == TRUE){paste(type)}else{paste(filetail)}, fsep = "_")
           csv.ending <- file.path(filename.path, "csv", fsep = ".")
           
@@ -227,39 +233,39 @@ imageprof <- function(basepath = NULL, savepath = NULL, filename, L_per_pix = 1,
           final
         } else if(stats == TRUE){
           mean_df <- final %>%
-            select(-x) %>%
+            select(-matrix.column.number) %>%
             summarise_all(funs(mean)) %>%
             t()%>%
             data.frame()
           colnames(mean_df)[colnames(mean_df) == "."] <- "mean"
           
           median_df <- final %>%
-            select(-x) %>%
+            select(-matrix.column.number) %>%
             summarise_all(funs(median)) %>%
             t()%>%
             data.frame()
           colnames(median_df)[colnames(median_df) == "."] <- "median"
           
           var_df <- final %>%
-            select(-x) %>%
+            select(-matrix.column.number) %>%
             summarise_all(funs(var)) %>%
             t()%>%
             data.frame()
           colnames(var_df)[colnames(var_df) == "."] <- "variance"
           
           sd_df <- final %>%
-            select(-x) %>%
+            select(-matrix.column.number) %>%
             summarise_all(funs(sd)) %>%
             t()%>%
             data.frame()
           colnames(sd_df)[colnames(sd_df) == "."] <- "standard.deviation"
           
           z <- nrow(mean_df)
-          x <- seq(1:z)
-          stats <- cbind(x, mean_df, median_df, var_df, sd_df)
+          image.order <- seq(1:z)
+          stats <- cbind(image.order, mean_df, median_df, var_df, sd_df)
           
-          ##connect save path to the filename folder
-          save <- file.path(save.path, filename)
+          ##connect save path with samplename
+          save <- file.path(save.path, if(is.null(samplename) == TRUE){paste(basename(basepath))}else{paste(samplename)})
           filename.path <- file.path(save, if(is.null(filetail) == TRUE){paste(type, "stats", sep = "_")}else{paste(filetail)}, fsep = "_")
           csv.ending <- file.path(filename.path, "csv", fsep = ".")
           
