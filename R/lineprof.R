@@ -26,8 +26,8 @@ lineprof <- function(data, L_per_pix = 1, type = "meanvar"){
   px_height = ncol(trans)
   
   final_meanvar <- name_cpt %>%
-    mutate(unit.length = cpt*L_per_pix) %>%
-    rownames_to_column(var = "time.interval")
+    mutate(unit.length = cpt*L_per_pix)%>%
+    rowid_to_column("time.interval")
   colnames(final_meanvar)[colnames(final_meanvar) == "cpt"] <- "pixel.changepoint"
   final_meanvar
   
@@ -43,7 +43,7 @@ lineprof <- function(data, L_per_pix = 1, type = "meanvar"){
     
     final_mean <- name_cpt %>%
       mutate(unit.length = cpt*L_per_pix) %>%
-      rownames_to_column(var = "time.interval")
+      rowid_to_column("time.interval")
     colnames(final_mean)[colnames(final_mean) == "cpt"] <- "pixel.changepoint"
     final_mean
   
@@ -61,7 +61,7 @@ lineprof <- function(data, L_per_pix = 1, type = "meanvar"){
     
     final_variance <- name_cpt %>%
       mutate(unit.length = pixel.changepoint*L_per_pix) %>%
-      rownames_to_column(var = "time.interval")
+      rowid_to_column("time.interval")
     
     final_variance
   
@@ -83,7 +83,7 @@ lineprof <- function(data, L_per_pix = 1, type = "meanvar"){
       
       dfmeanvar <- df1 %>%
         mutate(mv.unit.length = cpt*L_per_pix) %>%
-        rownames_to_column(var = "time.interval")
+        rowid_to_column("time.interval")
       colnames(dfmeanvar)[colnames(dfmeanvar) == "cpt"] <- "meanvar.cpt"
       
       dfmean <- df2 %>%

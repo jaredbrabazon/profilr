@@ -75,7 +75,7 @@ imageprof <- function(basepath = NULL, savepath = NULL, samplename = NULL, L_per
           mutate_all(funs(px_height - .)) %>%
           mutate_all(funs(.*L_per_pix)) %>%
           `colnames<-`(c(column_names)) %>%
-          rownames_to_column(var = "matrix.column.number")
+          rowid_to_column( "matrix.column.number")
         
         save.path <- savepath
         
@@ -147,7 +147,7 @@ imageprof <- function(basepath = NULL, savepath = NULL, samplename = NULL, L_per
           mutate_all(funs(px_height - .)) %>%
           mutate_all(funs(.*L_per_pix)) %>%
           `colnames<-`(c(column_names)) %>%
-          rownames_to_column(var = "matrix.column.number")
+          rowid_to_column( "matrix.column.number")
         
         save.path <- savepath
         
@@ -218,7 +218,7 @@ imageprof <- function(basepath = NULL, savepath = NULL, samplename = NULL, L_per
           mutate_all(funs(px_height - .)) %>%
           mutate_all(funs(.*L_per_pix)) %>%
           `colnames<-`(c(column_names)) %>%
-          rownames_to_column(var = "matrix.column.number")
+          rowid_to_column( "matrix.column.number")
         
         save.path <- savepath
       
