@@ -146,13 +146,13 @@ knitr::include_graphics("figs/fake_wetting.JPG")
 To visualize the movement of water, and detect the height of wetting at each point across the wetting front, I can use imageprof function as shown below. Here I am using changepoint analysis on each of the images, specifically looking at shifts in the mean and the variance for each column of the matrix as denoted by type = "meanvar". As samplename = NULL the folder name extdata will be used. L_per_pix = 1 so no unit conversion will take place. Lastly, filetail = NULL will give a general automated output ending name of the file. In this case, my saved file would appear as extdata_meanvar.csv in my designated save folder.
 
 ```{r}
-df <- imageprof(basepath = "./../inst/extdata/", savepath = "./../inst/temp_save_example/", samplename = NULL, L_per_pix = 1, stats = FALSE, type = "meanvar", filetail = NULL)
+df <- imageprof(basepath = "./../inst/extdata/", savepath = "./../inst/extdata/", samplename = NULL, L_per_pix = 1, stats = FALSE, type = "meanvar", filetail = NULL)
 
 print(head(df))
 
 ```
 ```{r include = FALSE}
-if (file.exists("./../inst/temp_save_example/extdata_meanvar.csv")) file.remove("./../inst/temp_save_example/extdata_meanvar.csv")
+if (file.exists("./../inst/extdata/extdata_meanvar.csv")) file.remove("./../inst/extdata/extdata_meanvar.csv")
 ```
 <br>
 <br>
@@ -160,49 +160,49 @@ if (file.exists("./../inst/temp_save_example/extdata_meanvar.csv")) file.remove(
 To override the default samplename and filetail, I can make the following changes resulting in a file saved as myfile_todaysdate.csv in my designated save folder. In this example, say I knew that the pixel length of the images was 0.0124 mm in length. Here I input L_per_pix = 0.0124 and the resulting change points are converted.
 
 ```{r}
-df <- imageprof(basepath = "./../inst/extdata/", savepath = "./../inst/temp_save_example/", samplename = "myfile", L_per_pix = 0.0124, stats = FALSE, type = "meanvar", filetail = "todaysdate")
+df <- imageprof(basepath = "./../inst/extdata/", savepath = "./../inst/extdata/", samplename = "myfile", L_per_pix = 0.0124, stats = FALSE, type = "meanvar", filetail = "todaysdate")
 
 print(head(df))
 
 ```
 ```{r include = FALSE}
-if (file.exists("./../inst/temp_save_example/myfile_todaysdate.csv")) file.remove("./../inst/temp_save_example/myfile_todaysdate.csv")
+if (file.exists("./../inst/extdata/myfile_todaysdate.csv")) file.remove("./../inst/extdata/myfile_todaysdate.csv")
 ```
 <br>
 <br>
 <br>
 Perhaps I would like to know the statistics of all of the wetting heights in the image. This can be done by allowing stats = TRUE as shown below. This saves a new file with only the statistics. So here we would have a file saved as wettingfront_meavar_stats.csv in the designated save folder.
 ```{r}
-stats_df <- imageprof(basepath = "./../inst/extdata/", savepath = "./../inst/temp_save_example/", samplename = "wettingfront", L_per_pix = 1, stats = TRUE, type = "meanvar", filetail = NULL)
+stats_df <- imageprof(basepath = "./../inst/extdata/", savepath = "./../inst/extdata/", samplename = "wettingfront", L_per_pix = 1, stats = TRUE, type = "meanvar", filetail = NULL)
 
 print(head(stats_df))
 
 ```
 ```{r include = FALSE}
-if (file.exists("./../inst/temp_save_example/wettingfront_meanvar_stats.csv")) file.remove("./../inst/temp_save_example/wettingfront_meanvar_stats.csv")
+if (file.exists("./../inst/extdata/wettingfront_meanvar_stats.csv")) file.remove("./../inst/extdata/wettingfront_meanvar_stats.csv")
 ```
 <br>
 <br>
 <br>
 The same steps as shown above can also be applied to type = "mean" and type = "variance"
 ```{r}
-df <- imageprof(basepath = "./../inst/extdata/", savepath = "./../inst/temp_save_example/", samplename = "wettingfront", L_per_pix = 1, stats = FALSE, type = "mean", filetail = NULL)
+df <- imageprof(basepath = "./../inst/extdata/", savepath = "./../inst/extdata/", samplename = "wettingfront", L_per_pix = 1, stats = FALSE, type = "mean", filetail = NULL)
 
 print(head(df))
 
 ```
 ```{r include = FALSE}
-if (file.exists("./../inst/temp_save_example/wettingfront_mean.csv")) file.remove("./../inst/temp_save_example/wettingfront_mean.csv")
+if (file.exists("./../inst/extdata/wettingfront_mean.csv")) file.remove("./../inst/extdata/wettingfront_mean.csv")
 ```
 
 ```{r}
-df <- imageprof(basepath = "./../inst/extdata/", savepath = "./../inst/temp_save_example/", samplename = "wettingfront", L_per_pix = 1, stats = FALSE, type = "variance", filetail = NULL)
+df <- imageprof(basepath = "./../inst/extdata/", savepath = "./../inst/extdata/", samplename = "wettingfront", L_per_pix = 1, stats = FALSE, type = "variance", filetail = NULL)
 
 print(head(df))
 
 ```
 ```{r include = FALSE}
-if (file.exists("./../inst/temp_save_example/wettingfront_variance.csv")) file.remove("./../inst/temp_save_example/wettingfront_variance.csv")
+if (file.exists("./../inst/extdata/wettingfront_variance.csv")) file.remove("./../inst/extdata/wettingfront_variance.csv")
 ```
 <br>
 <br>
