@@ -15,7 +15,6 @@ knitr::opts_chunk$set(fig.width=6, fig.height=4, fig.path='figs/',
 ```
 
 ```{r include = FALSE}
-library(kableExtra)
 library(devtools)
 library(knitr)
 load_all(pkg = "./../../profilr")
@@ -72,65 +71,75 @@ knitr::include_graphics("figs/sasvemacro.JPG")
 <br>
 <br>
 <br>
-By running the macro code, you are prompted to save the results. Doing this, being sure to save as a .csv allows for a dataframe of the picture pixel values over the fracture as shown below. (Note, if you do not use the macro, or are not analyzing image/pixel data, the lineprof function will still work for you. Just be sure to put your data in a similar format as shown below)
+By running the macro code, you are prompted to save the results. Doing this, being sure to save as a .csv allows for a dataframe of the picture pixel values over the fracture as shown below. (Note, if you do not use the macro, or are not analyzing image/pixel data, the lineprof function will still work for you. Just be sure to put your data in a similar format as shown below - including an 'X' column and then subsequent columns representing each image). This dataset is much larger, however, I have only shown the first 15 rows and 5 columns to save space.
 
 ```{r}
-kable(limestone, align=rep('c', nrow(limestone)))%>%
-  kable_styling(bootstrap_options = c("striped", "hover", "bordered")) %>%   scroll_box(width = "700px", height = "200px")
+kable(head(limestone[1:5], 15), align=rep('c', 6))
+  
 ```
 
-Now that I have my pixel data for all images in the stack. I want to see where the significant shifts are for each image (each image is a column of pixel values in the dataframe). Now depending on the type of data I have, I may want to detect significant shifts in the mean, variance, or both the mean and variance. Here, for these images, I want to detect significant shifts in the mean and the variance of the pixel values. With my data in the above format (note that limestone is an included dataset with this package), I can now use the lineprof function to get the changepoints for each image. In my case, I want the significant changes of the mean and variance. So I use the below code.
+Now that I have my pixel data for all images in the stack. I want to see where the significant shifts are for each image (each image is a column of pixel values in the dataframe). Now depending on the type of data I have, I may want to detect significant shifts in the mean, variance, or both the mean and variance. Here, for these particular images, I want to detect significant shifts in the mean and the variance of the pixel values. With my data in the above format (note that limestone is a dataset included with this package), I can now use the lineprof function to get the changepoints for each image. In my case, I want the significant changes of the mean and variance. So I use the below code.
 
 ```{r}
 meanvar_results <- lineprof(data = limestone, L_per_pix = 1, type = "meanvar")
-kable(meanvar_results, align=rep('c', nrow(meanvar_results)))%>%
-  kable_styling(bootstrap_options = c("striped", "hover", "bordered")) %>%   scroll_box(width = "700px", height = "200px")
+kable(head(meanvar_results), align=rep('c', 6))
+  
 ```
+
 <br>
 <br>
 <br>
 Say for example, that I knew that the pixel length was 0.0124 mm. I could use this conversion within the function to get my results in mm as shown below.
 <br>
+
 ```{r}
 converted_meanvar_results <- lineprof(data = limestone, L_per_pix = 0.0124, type = "meanvar")
-kable(converted_meanvar_results, align=rep('c', nrow(converted_meanvar_results)))%>%
-  kable_styling(bootstrap_options = c("striped", "hover", "bordered")) %>%   scroll_box(width = "700px", height = "200px")
+kable(head(converted_meanvar_results), align=rep('c', 6))
+  
 ```
+
 <br>
 <br>
 <br>
-If I wanted to detect changes in the mean only without converting units, I would use the below code.
+If I wanted to detect changes in the mean, I would use the below code.
 <br>
+
 ```{r}
 mean_results <- lineprof(data = limestone, L_per_pix = 1, type = "mean")
-kable(mean_results, align=rep('c', nrow(mean_results)))%>%
-  kable_styling(bootstrap_options = c("striped", "hover", "bordered")) %>%   scroll_box(width = "700px", height = "200px")
+kable(head(mean_results), align=rep('c', 6))
+  
 ```
+
 <br>
 <br>
 <br>
-If I wanted to detect changes in the variance only without converting units, I would use the below code.
+If I wanted to detect changes in the variance, I would use the below code.
 <br>
+
 ```{r}
 var_results <- lineprof(data = limestone, L_per_pix = 1, type = "variance")
-kable(var_results, align=rep('c', nrow(var_results)))%>%
-  kable_styling(bootstrap_options = c("striped", "hover", "bordered")) %>%   scroll_box(width = "700px", height = "200px")
+kable(head(var_results), align=rep('c', 6))
+  
 ```
+
 <br>
 <br>
 <br>
 If I want to compare all of the types of change point analysis, I can simply use type ="all" as shown below.
 <br>
+
 ```{r}
 all_results <- lineprof(data = limestone, L_per_pix = 0.0124, type = "all")
-kable(all_results, align=rep('c', nrow(all_results)))%>%
-  kable_styling(bootstrap_options = c("striped", "hover", "bordered")) %>%   scroll_box(width = "700px", height = "200px")
+kable(head(all_results), align=rep('c', 6))
+  
 ```
+
 <br>
 <br>
 <br>
 The great thing is that we can easily plot the results and see the change in wetting height with time.
 <br>
+
 ```{r}
 ggplot(data = converted_meanvar_results, aes(x = time.interval, y = unit.length))+
   geom_point()+
@@ -140,7 +149,7 @@ ggplot(data = converted_meanvar_results, aes(x = time.interval, y = unit.length)
 ```
 
 ### Delineate the height of fluid over an entire image (not just fracture)
-Say we now want to understand how fluids move over or along a surface and we want to delineate that moving front with time. This can be difficult as there may be great variation along this interface. This is a great tool for the imageprof function. 
+Say we now want to understand how fluids move over or along a surface and we want to delineate the moving front with respect to time. This can be difficult as there may be great variation along this interface. The imageprof function is a great way to delineate the change over the entire wetting front with time. 
 
 To use this tool, we need to have matrix images (.txt files) portraying the fluid movement saved in a folder. For this example I have generated a fake wetting front shown in these five .txt files.
 <br>
@@ -152,13 +161,13 @@ knitr::include_graphics("figs/fake_wetting.JPG")
 <br>
 <br>
 <br>
-To visualize the movement of water, and detect the height of wetting at each point across the wetting front, I can use imageprof function as shown below. Here I am using changepoint analysis on each of the images, specifically looking at shifts in the mean and the variance for each column of the matrix as denoted by type = "meanvar". As samplename = NULL the folder name extdata will be used. L_per_pix = 1 so no unit conversion will take place. Lastly, filetail = NULL will give a general automated output ending name of the file. In this case, my saved file would appear as extdata_meanvar.csv in my designated save folder.
+To visualize the movement of water, and detect the height of wetting at each point across the wetting front, I can use imageprof function as shown below. Here I am using changepoint analysis on each of the images, specifically looking at shifts in the mean and the variance for each column of the matrix as denoted by type = "meanvar". As samplename = NULL the base folder name, in this case 'extdata,' will be used. L_per_pix = 1 so no unit conversion will take place. Lastly, filetail = NULL will give a general automated output ending name of the file. In this case, my saved file would appear as 'extdata_meanvar.csv' in my designated savepath folder.
 
 ```{r}
 df <- imageprof(basepath = "./../inst/extdata/", savepath = "./../inst/extdata/", samplename = NULL, L_per_pix = 1, stats = FALSE, type = "meanvar", filetail = NULL)
 
-kable(df, align=rep('c', nrow(df)))%>%
-  kable_styling(bootstrap_options = c("striped", "hover", "bordered")) %>%   scroll_box(width = "700px", height = "200px")
+kable(head(df), align=rep('c', 6))
+  
 
 ```
 ```{r include = FALSE}
@@ -167,13 +176,13 @@ if (file.exists("./../inst/extdata/extdata_meanvar.csv")) file.remove("./../inst
 <br>
 <br>
 <br>
-To override the default samplename and filetail, I can make the following changes resulting in a file saved as myfile_todaysdate.csv in my designated save folder. In this example, say I knew that the pixel length of the images was 0.0124 mm in length. Here I input L_per_pix = 0.0124 and the resulting change points are converted.
+To override the default samplename and filetail, I can make the below changes resulting in a file saved as 'myfile_todaysdate.csv' in my designated save folder. In this example, say I knew that the pixel length of the images was 0.0124 mm in length. Here I input L_per_pix = 0.0124 and the resulting change points are converted to mm.
 
 ```{r}
 df <- imageprof(basepath = "./../inst/extdata/", savepath = "./../inst/extdata/", samplename = "myfile", L_per_pix = 0.0124, stats = FALSE, type = "meanvar", filetail = "todaysdate")
 
-kable(df, align=rep('c', nrow(df))) %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "bordered")) %>%   scroll_box(width = "700px", height = "200px")
+kable(head(df), align=rep('c', 6))
+  
 
 ```
 ```{r include = FALSE}
@@ -186,8 +195,8 @@ Perhaps I would like to know the statistics of all of the wetting heights in the
 ```{r}
 stats_df <- imageprof(basepath = "./../inst/extdata/", savepath = "./../inst/extdata/", samplename = "wettingfront", L_per_pix = 1, stats = TRUE, type = "meanvar", filetail = NULL)
 
-kable(stats_df, align=rep('c', nrow(stats_df)))%>%
-  kable_styling(bootstrap_options = c("striped", "hover", "bordered")) %>%   scroll_box(width = "700px", height = "200px")
+kable(head(stats_df), align=rep('c', 6))
+  
 
 ```
 ```{r include = FALSE}
@@ -200,8 +209,8 @@ The same steps as shown above can also be applied to type = "mean" and type = "v
 ```{r}
 df <- imageprof(basepath = "./../inst/extdata/", savepath = "./../inst/extdata/", samplename = "wettingfront", L_per_pix = 1, stats = FALSE, type = "mean", filetail = NULL)
 
-kable(df, align=rep('c', nrow(df)))%>%
-  kable_styling(bootstrap_options = c("striped", "hover", "bordered")) %>%   scroll_box(width = "700px", height = "200px")
+kable(head(df), align=rep('c', 6))
+  
 
 ```
 ```{r include = FALSE}
@@ -211,8 +220,8 @@ if (file.exists("./../inst/extdata/wettingfront_mean.csv")) file.remove("./../in
 ```{r}
 df <- imageprof(basepath = "./../inst/extdata/", savepath = "./../inst/extdata/", samplename = "wettingfront", L_per_pix = 1, stats = FALSE, type = "variance", filetail = NULL)
 
-kable(df, align=rep('c', nrow(df)))%>%
-  kable_styling(bootstrap_options = c("striped", "hover", "bordered")) %>%   scroll_box(width = "700px", height = "200px")
+kable(head(df), align=rep('c', 6))
+  
 
 ```
 ```{r include = FALSE}

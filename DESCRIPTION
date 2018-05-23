@@ -9,8 +9,7 @@ Depends: R (>= 3.3.0),
   tidyverse,
   changepoint
 Imports: tidyverse,
-  changepoint,
-    kableExtra
+  changepoint
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
